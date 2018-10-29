@@ -1,6 +1,7 @@
 import requests
 import pickle
 import json
+import urllib
 
 ##Get token and save to pickle
 def refresh_token():
@@ -39,5 +40,11 @@ def get_dump():
                 break
         except:
             print("proovin uuesti")
-##print(get_dump())
+##get auction data
 data = json.loads(get_dump())
+url = data["files"][0]["url"]
+lastModified = data["files"][0]["lastModified"]
+##write auction data json file
+with open(str(lastModified) + ".json", "w") as f:
+    aucdata = requests.get(url)
+    f.write(aucdata.text)
