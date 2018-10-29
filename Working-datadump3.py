@@ -40,11 +40,42 @@ def get_dump():
                 break
         except:
             print("proovin uuesti")
-##get auction data
-data = json.loads(get_dump())
-url = data["files"][0]["url"]
-lastModified = data["files"][0]["lastModified"]
-##write auction data json file
-with open(str(lastModified) + ".json", "w") as f:
-    aucdata = requests.get(url)
-    f.write(aucdata.text)
+####get auction data
+##data = json.loads(get_dump())
+##url = data["files"][0]["url"]
+##lastModified = data["files"][0]["lastModified"]
+####write auction data json file
+##with open(str(lastModified) + ".json", "w") as f:
+##    aucdata = requests.get(url)
+##    f.write(aucdata.text)
+            
+
+def get_itemname(itemID):
+    while True:
+        try:
+            token = get_token()
+            headers = {
+                'Authorization': 'Bearer ' + token,
+            }
+            params = (
+                (':itemId', itemID),
+                ('locale', 'en_GB')
+            )
+            response = requests.get('https://eu.api.blizzard.com/wow/item/' + str(itemID), headers=headers, params=params)
+            if response.text == "":
+                refresh_token()
+                print("Refreshing token")
+            else:
+                return(response.text)
+                break
+        except:
+            print("proovin uuesti")
+            
+with open("1540813527000.json") as f:
+    data = json.loads(f.read())
+    for i in range(len(data["auctions"])):
+        itemID = data["auctions"][i]["item"]
+        itemname = json.loads(get_itemname(itemID))["name"]
+        print(str(itemID) + " - " + itemname)
+        
+            
