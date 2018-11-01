@@ -73,9 +73,15 @@ def get_itemname(itemID):
             
 with open("1540813527000.json") as f:
     data = json.loads(f.read())
+    asjad = {}
+    
     for i in range(len(data["auctions"])):
         itemID = data["auctions"][i]["item"]
-        itemname = json.loads(get_itemname(itemID))["name"]
-        print(str(itemID) + " - " + itemname)
+        if itemID not in asjad:
+            itemname = json.loads(get_itemname(itemID))["name"]
+            print(str(itemID) + " - " + itemname)
+            asjad[itemID] = itemname
+        else:
+            continue
         
             
