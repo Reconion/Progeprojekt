@@ -40,14 +40,16 @@ def get_dump():
                 break
         except:
             print("proovin uuesti")
-####get auction data
-##data = json.loads(get_dump())
-##url = data["files"][0]["url"]
-##lastModified = data["files"][0]["lastModified"]
-####write auction data json file
-##with open(str(lastModified) + ".json", "w") as f:
-##    aucdata = requests.get(url)
-##    f.write(aucdata.text)
+
+##Save item data
+def get_data():
+    data = json.loads(get_dump())
+    url = data["files"][0]["url"]
+    lastModified = data["files"][0]["lastModified"]
+    ##write auction data json file
+    with open(str(lastModified) + ".json", "w") as f:
+        aucdata = requests.get(url)
+        f.write(aucdata.text)
             
 
 def get_itemname(itemID):
@@ -72,12 +74,15 @@ def get_itemname(itemID):
             print("proovin uuesti")
             
 with open("1540813527000.json") as f:
-    with open("nimekiri.txt", "w") as g:
-        data = json.loads(f.read())
-        for i in range(len(data["auctions"])):
-            itemID = data["auctions"][i]["item"]
+    data = json.loads(f.read())
+    items = {}
+    for i in range(len(data["auctions"])):
+        itemID = data["auctions"][i]["item"]
+        if itemID not in items:
             itemname = json.loads(get_itemname(itemID))["name"]
-            g.write(str(itemID) + " - " + itemname + "\n")
-            print(str(i)+ ".  " + str(itemID) + " - " + itemname)
-        
-            
+            print(str(i) + ".   " + str(itemID) + " - " + itemname)
+            items[itemID] = itemname
+        else:
+            continue
+with open("items.json", "w") as f:
+    json.dump(items, f)
