@@ -72,10 +72,12 @@ def get_itemname(itemID):
             print("proovin uuesti")
             
 with open("1540813527000.json") as f:
-    data = json.loads(f.read())
-    for i in range(len(data["auctions"])):
-        itemID = data["auctions"][i]["item"]
-        itemname = json.loads(get_itemname(itemID))["name"]
-        print(str(itemID) + " - " + itemname)
+    with open("nimekiri.txt", "w") as g:
+        data = json.loads(f.read())
+        for i in range(len(data["auctions"])):
+            itemID = data["auctions"][i]["item"]
+            itemname = json.loads(get_itemname(itemID))["name"]
+            g.write(str(itemID) + " - " + itemname + "\n")
+            print(str(i)+ ".  " + str(itemID) + " - " + itemname)
         
             
