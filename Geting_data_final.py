@@ -2,6 +2,10 @@ import requests
 import pickle
 import json
 import urllib
+import schedule
+import time
+##pip install requests
+##pip install schedule
 
 ##Get token and save to pickle
 def refresh_token():
@@ -99,34 +103,49 @@ def add_item(item, i=""):
     with open("items.json", "w") as f:
         json.dump(data, f)
     return data[item]
-##def get_data():
-data = json.loads(get_dump())
-url = data["files"][0]["url"]
-lastModified = data["files"][0]["lastModified"]
-##write auction data json file
-aucdata = json.loads(requests.get(url).text)
-auctions = {}
-with open("items.json") as f:
-    itemnames = json.load(f)
-for i in range(len(aucdata["auctions"])):
-    auc_item = aucdata["auctions"][i]["item"]
-    if str(auc_item) not in itemnames:
-        itemnames[str(auc_item)] = add_item(str(auc_item), i)
-    if itemnames[str(auc_item)].upper() not in auctions:
-        auctions[itemnames[str(auc_item)].upper()] = {}
-        auctions[itemnames[str(auc_item)].upper()]["buyouts"] = []
-        auctions[itemnames[str(auc_item)].upper()]["buyouts"].append(aucdata["auctions"][i]["buyout"])
-        auctions[itemnames[str(auc_item)].upper()]["quantity"] = aucdata["auctions"][i]["quantity"]
-        
-    else:
-        auctions[itemnames[str(auc_item)].upper()]["buyouts"].append(aucdata["auctions"][i]["buyout"])
-        auctions[itemnames[str(auc_item)].upper()]["quantity"] += aucdata["auctions"][i]["quantity"]
-##Process auctions
-for i in auctions:
-    auctions[i]["avg_buyout"] = int(sum(auctions[i]["buyouts"])/auctions[i]["quantity"])
-    auctions[i]["min_buyout"] = min(auctions[i]["buyouts"])
-    auctions[i].pop("buyouts")
-##Write to json
-with open("data/" + str(lastModified) + ".json", "w") as f:
-    json.dump(auctions, f)
+def get_data():
+    data = json.loads(get_dump())
+    url = data["files"][0]["url"]
+    lastModified = data["files"][0]["lastModified"]
+    ##write auction data json file
+    aucdata = json.loads(requests.get(url).text)
+    auctions = {}
+    with open("items.json") as f:
+        itemnames = json.load(f)
+    for i in range(len(aucdata["auctions"])):
+        auc_item = aucdata["auctions"][i]["item"]
+        if str(auc_item) not in itemnames:
+            itemnames[str(auc_item)] = add_item(str(auc_item), i)
+        if itemnames[str(auc_item)].upper() not in auctions:
+            auctions[itemnames[str(auc_item)].upper()] = {}
+            auctions[itemnames[str(auc_item)].upper()]["buyouts"] = []
+            auctions[itemnames[str(auc_item)].upper()]["buyouts"].append(aucdata["auctions"][i]["buyout"])
+            auctions[itemnames[str(auc_item)].upper()]["quantity"] = aucdata["auctions"][i]["quantity"]
             
+        else:
+            auctions[itemnames[str(auc_item)].upper()]["buyouts"].append(aucdata["auctions"][i]["buyout"])
+            auctions[itemnames[str(auc_item)].upper()]["quantity"] += aucdata["auctions"][i]["quantity"]
+    ##Process auctions
+    for i in auctions:
+        auctions[i]["avg_buyout"] = int(sum(auctions[i]["buyouts"])/auctions[i]["quantity"])
+        auctions[i]["min_buyout"] = min(auctions[i]["buyouts"])
+        auctions[i].pop("buyouts")
+    ##Write to json
+    with open("data/" + str(lastModified) + ".json", "w") as f:
+        json.dump(auctions, f)
+##Tuleb raspberry schedule hoopis
+####Jookse raspberry peal
+##schedule.every().day.at("00:00").do(get_data)
+##schedule.every().day.at("03:00").do(get_data)
+##schedule.every().day.at("06:00").do(get_data)
+##schedule.every().day.at("09:00").do(get_data)
+##schedule.every().day.at("12:00").do(get_data)
+##schedule.every().day.at("15:00").do(get_data)
+##schedule.every().day.at("18:00").do(get_data)
+##schedule.every().day.at("21:00").do(get_data)
+##while 1:
+##    schedule.run_pending()
+##    time.sleep(1)
+##Clearing schedule (programmi seisma jätmine ei clreari eelmisi schedule asju)
+##schedule.clear()
+get_data()
