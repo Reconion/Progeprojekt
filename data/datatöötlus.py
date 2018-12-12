@@ -11,10 +11,10 @@ def use_data(find_name):
             with open(filename, "r") as f:
                 data = json.load(f)
             loetelu.append(data[find_name])
-    return loetelu,aeg
+    return loetelu,aeg,find_name
 
 
-def draw_data(asjad, ajad):
+def draw_data(asjad, ajad, asi):
     import plotly.plotly as py
     import plotly.graph_objs as go
     py.sign_in("progeprojekt","KWqEAqvRK5APokKTNEwe")
@@ -45,11 +45,30 @@ def draw_data(asjad, ajad):
         name = "miinimumhind")
     
     data = [trace1,trace2,trace3]
-    py.plot(data, filename= "line-mode")
+    
+    layout = go.Layout(
+        title=asi,
+        xaxis=dict(
+            title="Kuupäev",
+            titlefont=dict(
+                family='Courier New, monospace',
+                size=18,
+                color='#7f7f7f')),
+        yaxis=dict(
+            title="Hind",
+            titlefont=dict(
+                family='Courier New, monospace',
+                size=18,
+                color='#7f7f7f')))
+    
+    fig = go.Figure(data=data, layout=layout)
+    plot_url = py.plot(fig, filename="progeprojekt")
+    
+#    py.plot(data, filename= "line-mode", layout=layout)
     
     
 suvaline_asi = use_data(input("Mis itemi hinda tahad: ")) 
-draw_data(suvaline_asi[0],suvaline_asi[1])
+draw_data(suvaline_asi[0],suvaline_asi[1],suvaline_asi[2])
 
     
     
