@@ -25,7 +25,7 @@ def draw_data(asjad, ajad):
         kogus.append(i["quantity"])
         keskmine_hind.append(i["avg_buyout"])
         min_hind.append(i["min_buyout"])
-    print(min_hind)
+        
     trace1 = go.Scatter(
         x = ajad,
         y = kogus,
@@ -45,10 +45,10 @@ def draw_data(asjad, ajad):
         name = "miinimumhind")
     
     data = [trace1,trace2,trace3]
-    py.iplot(data, filename= "line-mode")
+    py.plot(data, filename= "line-mode")
     
     
-suvaline_asi = use_data("linen cloth") 
+suvaline_asi = use_data(input("Mis itemi hinda tahad: ")) 
 draw_data(suvaline_asi[0],suvaline_asi[1])
 
     
