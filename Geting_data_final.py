@@ -2,14 +2,13 @@ import requests
 import pickle
 import json
 import urllib
-import schedule
-import time
+import os
+os.chdir("/home/pi/Desktop/Progeprojekt")
 ##pip install requests
 ##pip install schedule
 
 ##Get token and save to pickle
 def refresh_token():
-    import requests
     data = {
       'grant_type': 'client_credentials'
     }
@@ -108,7 +107,9 @@ def get_data():
     url = data["files"][0]["url"]
     lastModified = data["files"][0]["lastModified"]
     ##write auction data json file
+    print("Getng the data, this might take a while")
     aucdata = json.loads(requests.get(url).text)
+    print("Processing")
     auctions = {}
     with open("items.json") as f:
         itemnames = json.load(f)
@@ -119,16 +120,20 @@ def get_data():
         if itemnames[str(auc_item)].upper() not in auctions:
             auctions[itemnames[str(auc_item)].upper()] = {}
             auctions[itemnames[str(auc_item)].upper()]["buyouts"] = []
-            auctions[itemnames[str(auc_item)].upper()]["buyouts"].append(aucdata["auctions"][i]["buyout"])
+            auctions[itemnames[str(auc_item)].upper()]["buyouts"].append(int(aucdata["auctions"][i]["buyout"]/aucdata["auctions"][i]["quantity"]))
             auctions[itemnames[str(auc_item)].upper()]["quantity"] = aucdata["auctions"][i]["quantity"]
             
         else:
-            auctions[itemnames[str(auc_item)].upper()]["buyouts"].append(aucdata["auctions"][i]["buyout"])
+            auctions[itemnames[str(auc_item)].upper()]["buyouts"].append(int(aucdata["auctions"][i]["buyout"])/aucdata["auctions"][i]["quantity"])
             auctions[itemnames[str(auc_item)].upper()]["quantity"] += aucdata["auctions"][i]["quantity"]
+        if int(aucdata["auctions"][i]["buyout"]) == 0:
+            auctions[itemnames[str(auc_item)].upper()]["buyouts"].remove(0)
+            auctions[itemnames[str(auc_item)].upper()]["quantity"] -= aucdata["auctions"][i]["quantity"]
     ##Process auctions
     for i in auctions:
-        auctions[i]["avg_buyout"] = int(sum(auctions[i]["buyouts"])/auctions[i]["quantity"])
-        auctions[i]["min_buyout"] = min(auctions[i]["buyouts"])
+        if auctions[i]["quantity"] != 0:
+            auctions[i]["avg_buyout"] = int(sum(auctions[i]["buyouts"])/len(auctions[i]["buyouts"]))
+            auctions[i]["min_buyout"] = min(auctions[i]["buyouts"])
         auctions[i].pop("buyouts")
     ##Write to json
     with open("data/" + str(lastModified) + ".json", "w") as f:
